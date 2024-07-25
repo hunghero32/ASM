@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
+
 use App\Models\Product;
+use Illuminate\Http\Request;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
-
+use Illuminate\Support\Facades\Storage;
 class ProductController extends Controller
 {
     /**
@@ -72,9 +75,17 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        //
-        $product->update($request->all());
-        $product->save();
+        $data = $request->all();
+
+        if ($request->hasFile('img')) {
+            // Xóa hình ảnh cũ nếu có
+            if ($product->img && Storage::disk('public')->exists($product->img)) {
+                Storage::disk('public')->delete($product->img);
+            }
+            $data['img'] = $request->file('img')->store('products', 'public');
+        }
+
+        $product->update($data);
         return redirect()->route('admin.index')->with('success', 'Sản phẩm đã được cập nhật thành công.');
     }
 
@@ -87,12 +98,37 @@ class ProductController extends Controller
         $product->delete();
         return redirect()->route('admin.index')->with('success', 'Sản phẩm đã được xóa thành công.');
     }
-    public function indexpro()
+    public function indexpro(Request $request)
     {
-        //
-        // $products = Product::all();
-        $products = Product::take(6)->get();
-        return view('guest.home', compact('products'));
+        $categories = Category::all();
+    
+        $query = Product::where('is_active', 1);
+    
+        // Lọc theo Category
+        if ($request->has('category_id') && !is_null($request->input('category_id'))) {
+            $query->where('category_id', $request->input('category_id'));
+        }
+    
+        // Lọc theo Phạm vi Giá
+        if ($request->has('price_min') && !is_null($request->input('price_min'))) {
+            $priceMin = (float) $request->input('price_min');
+            $query->where('new_price', '>=', $priceMin);
+        }
+    
+        if ($request->has('price_max') && !is_null($request->input('price_max'))) {
+            $priceMax = (float) $request->input('price_max');
+            $query->where('new_price', '<=', $priceMax);
+        }
+    
+        // Lọc theo Số lượng
+        if ($request->has('min_quantity') && !is_null($request->input('min_quantity'))) {
+            $minQuantity = (int) $request->input('min_quantity');
+            $query->where('quantity', '>=', $minQuantity);
+        }
+    
+        $products = $query->take(6)->get();
+    
+        return view('guest.home', compact('products', 'categories'));
     }
     public function showpro(Product $product)
     {

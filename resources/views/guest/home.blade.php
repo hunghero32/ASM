@@ -8,32 +8,41 @@
     </div>
     @endif
 
-    <!-- Carousel -->
-    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-indicators">
-            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
-            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
-        </div>
-        <div class="carousel-inner w-2000 h-800">
-            <div class="carousel-item active">
-                <img src="slide1.jpg" class="d-block w-100" alt="Slide 1">
-            </div>
-            <div class="carousel-item">
-                <img src="slide2.jpg" class="d-block w-100" alt="Slide 2">
-            </div>
-            <div class="carousel-item">
-                <img src="slide3.jpg" class="d-block w-100" alt="Slide 3">
-            </div>
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
+    <!-- Filters -->
+    <div class="container mt-4">
+    <form method="GET" action="{{ route('guest.index') }}" class="row g-3 p-3 border rounded bg-light shadow-sm">
+    <div class="col-md-4">
+        <label for="category_id" class="form-label">Category</label>
+        <select class="form-select" id="category_id" name="category_id">
+            <option value="">Choose...</option>
+            @foreach($categories as $category)
+                <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                    {{ $category->name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+
+    <div class="col-md-4">
+        <label for="min_price" class="form-label">Min Price</label>
+        <input type="number" class="form-control" id="min_price" name="min_price" placeholder="Enter min price" value="{{ request('min_price') }}">
+    </div>
+
+    <div class="col-md-4">
+        <label for="max_price" class="form-label">Max Price</label>
+        <input type="number" class="form-control" id="max_price" name="max_price" placeholder="Enter max price" value="{{ request('max_price') }}">
+    </div>
+
+    <div class="col-md-6">
+        <label for="min_quantity" class="form-label">Min Quantity</label>
+        <input type="number" class="form-control" id="min_quantity" name="min_quantity" placeholder="Enter min quantity" value="{{ request('min_quantity') }}">
+    </div>
+
+    <div class="col-md-6 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+    </div>
+</form>
+
     </div>
 
     <!-- Hot Products -->
@@ -43,7 +52,10 @@
             @foreach ($products as $product)
             <div class="col-md-4">
                 <div class="card">
-                    <img src="{{ $product->img }}" class="card-img-top" alt="{{ $product->name }}">
+                    @php
+                    $imgUrl = filter_var($product->img, FILTER_VALIDATE_URL) ? $product->img : Storage::url($product->img);
+                    @endphp
+                    <img src="{{ $imgUrl }}" class="card-img-top" alt="{{ $product->name }}">
                     <div class="card-body">
                         <h5 class="card-title">{{ $product->name }}</h5>
                         <p class="card-text">Giá Bán :
@@ -51,7 +63,6 @@
                             <strong class="text-danger">{{ number_format($product->new_price, 0, ',', '.') }}đ</strong>
                         </p>
                         <p class="card-text">Số Lượng: {{ $product->quantity }}</p>
-                        <!-- <a href="" class="btn btn-danger">Thêm Giỏ Hàng</a> -->
                         <div class="d-flex justify-content-between">
                             <form action="{{ route('cart.add') }}" method="POST" class="d-inline">
                                 @csrf
@@ -103,4 +114,5 @@
     <footer class="bg-dark text-white text-center py-3 mt-4">
         <p>&copy; 2024 My Shop. All rights reserved.</p>
     </footer>
-    @endsection
+</div>
+@endsection

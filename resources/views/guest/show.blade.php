@@ -25,7 +25,10 @@
 
             <div class="row">
                 <div class="col-md-6">
-                    <img src="{{ $product->img }}" class="img-fluid" alt="{{ $product->name }}">
+                @php
+                    $imgUrl = filter_var($product->img, FILTER_VALIDATE_URL) ? $product->img : Storage::url($product->img);
+                    @endphp
+                    <img src="{{ $imgUrl }}" class="card-img-top" alt="{{ $product->name }}">
                 </div>
                 <div class="col-md-6">
                     <h1>{{ $product->name }}</h1>

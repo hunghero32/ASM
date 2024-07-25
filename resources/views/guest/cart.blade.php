@@ -10,6 +10,7 @@
     <table class="table table-bordered">
         <thead>
             <tr>
+                <th>Ảnh</th>
                 <th>Sản phẩm</th>
                 <th>Số lượng</th>
                 <th>Giá</th>
@@ -23,6 +24,12 @@
                 $product = $item->product;
                 $total = $product->new_price * $item->quantity;
             @endphp
+            <tr>
+            @php
+                    $imgUrl = filter_var($product->img, FILTER_VALIDATE_URL) ? $product->img : Storage::url($product->img);
+                    @endphp
+                    <img src="{{ $imgUrl }}" class="card-img-top" alt="{{ $product->name }}">
+            </tr>
             <tr data-price="{{ $product->new_price }}" data-quantity="{{ $item->quantity }}">
                 <td>{{ $product->name }}</td>
                 <td>{{ $item->quantity }}</td>

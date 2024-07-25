@@ -31,10 +31,10 @@
         <div class="mb-3">
             <label for="img" class="form-label">Ảnh</label>
             <input type="file" class="form-control" id="img" name="img">
-            @if($product->img)
-                <!-- <img src="{{ asset('storage/' . $product->img) }}" alt="Product Image" class="img-thumbnail mt-2" style="width: 150px;"> -->
-                <img src="{{ $product->img }}" alt="Product Image" class="img-thumbnail mt-2" style="width: 150px;">
-            @endif
+            @php
+                    $imgUrl = filter_var($product->img, FILTER_VALIDATE_URL) ? $product->img : Storage::url($product->img);
+                    @endphp
+                    <img src="{{ $imgUrl }}" class="card-img-top" alt="{{ $product->name }}" style="width: 150px;">
         </div>
 
         <div class="mb-3">

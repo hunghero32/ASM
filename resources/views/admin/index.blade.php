@@ -25,7 +25,12 @@
             @foreach ($products as $product)
             <tr>
                 <th scope="row">{{ $product->id }}</th>
-                <td><img style="width: 50px;" src="{{ $product->img }}" class="card-img-top" alt="{{ $product->name }}"></td>
+                <td><a href="{{ route('admin.show', $product->id) }}">
+                @php
+                    $imgUrl = filter_var($product->img, FILTER_VALIDATE_URL) ? $product->img : Storage::url($product->img);
+                    @endphp
+                    <img src="{{ $imgUrl }}" class="card-img-top" alt="{{ $product->name }}" style="width: 50px;">
+                    </a></td>
                 <td>{{ $product->name }}</td>
                 <td>{{ number_format($product->old_price, 0, ',', '.') }}đ / {{ number_format($product->new_price, 0, ',', '.') }}đ</td>
                 <td>{{ $product->quantity }}</td>
@@ -45,7 +50,7 @@
                         <button type="submit">Xóa</button>
                     </form>
                 </td>
-            </tr>
+                </tr>
             @endforeach
         </tbody>
     </table>

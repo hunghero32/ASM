@@ -31,10 +31,10 @@
         <div class="mb-3">
             <label for="img" class="form-label">Ảnh</label>
             <input type="file" class="form-control" id="img" name="img">
-            @if($product->img)
-                <!-- <img src="{{ asset('storage/' . $product->img) }}" alt="Product Image" class="img-thumbnail mt-2" style="width: 150px;"> -->
-                <img src="{{ $product->img }}" alt="Product Image" class="img-thumbnail mt-2" style="width: 150px;">
-            @endif
+            @php
+                    $imgUrl = filter_var($product->img, FILTER_VALIDATE_URL) ? $product->img : Storage::url($product->img);
+                    @endphp
+                    <img src="{{ $imgUrl }}" class="card-img-top" alt="{{ $product->name }}" style="width: 150px;">
         </div>
 
         <div class="mb-3">
@@ -51,7 +51,7 @@
             <label for="is_active" class="form-label">Trạng Thái</label>
             <select class="form-select" id="is_active" name="is_active" required>
                 <option value="1" {{ $product->is_active ? 'selected' : '' }}>Hoạt Động</option>
-                <option value="0" {{ !$product->is_active ? 'selected' : '' }}>Không Khoạt Động</option>
+                <option value="0" {{ !$product->is_active ? 'selected' : '' }}>Không Hoạt Động</option>
             </select>
         </div>
 
@@ -67,17 +67,9 @@
             </select>
         </div>
 
-        <div class="mb-3">
-            <label for="created_at" class="form-label">Thời gian tạo</label>
-            <input type="text" class="form-control" id="created_at" value="{{ $product->created_at }}" disabled>
-        </div>
+        
 
-        <div class="mb-3">
-            <label for="updated_at" class="form-label">Cập nhật mới nhất</label>
-            <input type="text" class="form-control" id="updated_at" value="{{ $product->updated_at }}" disabled>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Update</button>
+        <!-- <button type="submit" class="btn btn-primary">Update</button> -->
     </form>
 </div>
 @endsection
