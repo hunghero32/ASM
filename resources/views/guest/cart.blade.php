@@ -21,16 +21,16 @@
         <tbody id="cart-items">
             @foreach($cartItems as $item)
             @php
-                $product = $item->product;
-                $total = $product->new_price * $item->quantity;
+            $product = $item->product;
+            $total = $product->new_price * $item->quantity;
             @endphp
-            <tr>
-            @php
-                    $imgUrl = filter_var($product->img, FILTER_VALIDATE_URL) ? $product->img : Storage::url($product->img);
-                    @endphp
-                    <img src="{{ $imgUrl }}" class="card-img-top" alt="{{ $product->name }}">
-            </tr>
             <tr data-price="{{ $product->new_price }}" data-quantity="{{ $item->quantity }}">
+                @php
+                $imgUrl = filter_var($product->img, FILTER_VALIDATE_URL) ? $product->img : Storage::url($product->img);
+                @endphp
+                <td>
+                    <img src="{{ $imgUrl }}" class="card-img-top" alt="{{ $product->name }}" style="width: 50px;">
+                </td>
                 <td>{{ $product->name }}</td>
                 <td>{{ $item->quantity }}</td>
                 <td>{{ number_format($product->new_price, 0, ',', '.') }} đ</td>
