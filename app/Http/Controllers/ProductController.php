@@ -100,7 +100,7 @@ class ProductController extends Controller
     }
     public function indexpro(Request $request)
     {
-        $categories = Category::all();
+        $categories = Category::where('is_active', 1)->get();
     
         $query = Product::where('is_active', 1);
     

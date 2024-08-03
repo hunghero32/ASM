@@ -16,35 +16,57 @@
     ->get();
     $discountPercentage = (($product->old_price - $product->new_price) / $product->old_price) * 100;
     @endphp
+
     <div class="container mt-4">
-        <div class="row">
-        <form action="{{ route('guest.cart') }}" method="POST"></form>
-            <div class="col-md-6">
-                <img src="{{ $product->img }}" class="img-fluid" alt="{{ $product->name }}">
-            </div>
-            <div class="col-md-6">
-                <h1>{{ $product->name }}</h1>
-                <p>Loại Sản Phẩm: <strong>{{ $category->name }}</strong></p>
-                    @csrf
-                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+        <form action="{{ route('cart.add') }}" method="POST">
+            @csrf
+            <input type="hidden" name="product_id" value="{{ $product->id }}">
+
+            <div class="row">
+                <div class="col-md-6">
+                @php
+                    $imgUrl = filter_var($product->img, FILTER_VALIDATE_URL) ? $product->img : Storage::url($product->img);
+                    @endphp
+                    <img src="{{ $imgUrl }}" class="card-img-top" alt="{{ $product->name }}">
+                </div>
+                <div class="col-md-6">
+                    <h1>{{ $product->name }}</h1>
+                    <p>Loại Sản Phẩm: <strong>{{ $category->name }}</strong></p>
                     <div class="form-group">
                         <label for="quantity">Số Lượng:</label>
-                        <input type="number" id="quantity" name="quantity" class="form-control" value="1" min="1" max="{{ $product->quantity }}">
+                        <input type="number" id="quantity" name="quantity" class="form-control" value="1" min="1" max="{{ $product->quantity }}" onchange="updateTotal()">
                     </div>
-                <p>Giá Bán :
-                    <del class="card-text">{{ number_format($product->old_price, 0, ',', '.') }}đ</del> /
-                    <strong class="text-danger">{{ number_format($product->new_price, 0, ',', '.') }}đ</strong>
-                    Giảm giá: <strong>{{ round($discountPercentage) }}%</strong>
-                </p>
-                <p>Khuyến mại đi kèm : {{ $promote->name }}</p>
-                <p>Mô Tả: </p>
-                <p>{{ $product->desc }}</p>
+                    <p>Giá Bán :
+                        <del class="card-text">{{ number_format($product->old_price, 0, ',', '.') }}đ</del> /
+                        <strong id="new-price" class="text-danger">{{ number_format($product->new_price, 0, ',', '.') }}đ</strong>
+                        Giảm giá: <strong>{{ round($discountPercentage) }}%</strong>
+                    </p>
+                    <p>Mô Tả: </p>
+                    <p>{{ $product->desc }}</p>
+                    <div class="form-group">
+                        <p id="total-price">Tổng Giá: {{ number_format($product->new_price, 0, ',', '.') }}đ</p>
+                    </div>
 
-                <!-- <a href="#" class="btn btn-primary">Thêm Giỏ Hàng</a> -->
-                <button type="submit" class="btn btn-primary">Thêm Giỏ Hàng</button>
+                    <button type="submit" class="btn btn-danger">Thêm Giỏ Hàng</button>
+                </div>
             </div>
-            </form>
-        </div>
+        </form>
+        <script>
+            function updateTotal() {
+                // Lấy giá mới và số lượng
+                var newPrice = parseFloat(document.getElementById('new-price').innerText.replace(/\./g, '').replace('đ', ''));
+                var quantity = parseInt(document.getElementById('quantity').value);
+
+                // Tính toán tổng giá
+                var totalPrice = newPrice * quantity;
+
+                // Cập nhật giá tổng trên giao diện
+                document.getElementById('total-price').innerText = 'Tổng Giá: ' + totalPrice.toLocaleString('vi-VN') + 'đ';
+            }
+
+            // Gọi hàm updateTotal khi trang được tải để đảm bảo giá tổng ban đầu được tính đúng
+            window.onload = updateTotal;
+        </script>
 
         <div class="row mt-4">
             <div class="col-12">
@@ -69,5 +91,6 @@
             @endforeach
         </div>
     </div>
+
 </div>
 @endsection

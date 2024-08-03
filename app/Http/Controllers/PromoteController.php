@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Promote;
@@ -8,59 +7,30 @@ use App\Http\Requests\UpdatePromoteRequest;
 
 class PromoteController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $promotes = Promote::all();
+        return view('admin.promotes.index', compact('promotes'));
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StorePromoteRequest $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show(Promote $promote)
     {
-        //
+        return view('admin.promotes.show', compact('promote'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Promote $promote)
     {
-        //
+        return view('admin.promotes.edit', compact('promote'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdatePromoteRequest $request, Promote $promote)
     {
-        //
+        $promote->update($request->all());
+        return redirect()->route('admin.promotes.index')->with('success', 'Promotion updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Promote $promote)
     {
-        //
+        $promote->delete();
+        return redirect()->route('admin.promotes.index')->with('success', 'Promotion deleted successfully.');
     }
 }

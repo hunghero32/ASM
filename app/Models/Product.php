@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'name',
         'new_price',
@@ -18,4 +19,8 @@ class Product extends Model
         'is_active',
         'category_id',
     ];
+    public function invoices()
+    {
+        return $this->belongsToMany(Invoice::class, 'invoice_products')->withPivot('quantity')->withTimestamps();
+    }
 }

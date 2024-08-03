@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Http\Requests\StoreCartRequest;
 use App\Http\Requests\UpdateCartRequest;
+use App\Mail\OrderConfirmationMail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
@@ -104,12 +106,24 @@ class CartController extends Controller
     public function checkout(Cart $cart)
     {
         $userId = Auth::id();
-        $cartItems = Cart::where('user_id', $userId)->get();
-
-        // Thực hiện các thao tác thanh toán COD như tạo đơn hàng, gửi thông báo, v.v.
+        $cartItems = Cart::where('user_id', $userId)->with('product')->get();
+    
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart.show')->with('error', 'Giỏ hàng của bạn đang trống!');
+        }
+    
+        // Tính tổng số tiền
+        $totalAmount = $cartItems->sum(function ($item) {
+            return $item->product->new_price * $item->quantity;
+        });
+    
+        // Gửi email xác nhận đơn hàng
+        $customerName = Auth::user()->name; // Lấy tên khách hàng
+        Mail::to(Auth::user()->email)->send(new OrderConfirmationMail($cartItems, $customerName, $totalAmount));
+    
         // Xóa giỏ hàng sau khi thanh toán
         Cart::where('user_id', $userId)->delete();
-
+    
         return redirect()->route('cart.show')->with('success', 'Thanh toán thành công! Cảm ơn bạn đã mua hàng.');
     }
 }

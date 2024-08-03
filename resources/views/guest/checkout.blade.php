@@ -1,4 +1,3 @@
-{{-- resources/views/checkout.blade.php --}}
 @extends('layouts.user')
 
 @section('content')

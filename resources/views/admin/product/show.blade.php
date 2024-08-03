@@ -71,6 +71,9 @@
 
         <!-- <button type="submit" class="btn btn-primary">Update</button> -->
     </form>
+    <div class="mt-3">
+            <a href="{{ route('admin.index') }}" class="btn btn-secondary">Back</a>
+        </div>
     </div>
 </div>
 @endsection
